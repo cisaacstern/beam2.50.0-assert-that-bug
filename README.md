@@ -1,0 +1,1 @@
+# beam2.50.0-assert-that-bug
