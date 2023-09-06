@@ -1,0 +1,37 @@
+name: Test assert_that
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    name: Test (beam${{ matrix.beam-version }}, from ${{ matrix.install-from }})
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        beam-version: ["2.49.0", "2.50.0"]
+        install-from: ["pip", "conda"]
+    steps:
+      - name: 🔁 Setup mamba
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+      - name: 🐝 Install beam ${{ matrix.beam-version }} from ${{ matrix.install-from }}
+        shell: bash -l {0}
+        run: ${{ matrix.install-from }} install "apache-beam==${{ matrix.beam-version }}"
+      - name: 🧪 Install pytest
+        shell: bash -l {0}
+        run: pip install pytest
+      - name: 🐍 List conda env
+        shell: bash -l {0}
+        run: |
+          conda info
+          conda list
+      - name: 🏃 Run tests
+        shell: bash -l {0}
+        run: pytest -vvv test_assert_that.py
